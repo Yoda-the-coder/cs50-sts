@@ -47,3 +47,20 @@ def get_ui_yn(message):
         if not choice == "y" or not choice == "n":
             print(error_prompt)
     return choice
+
+
+def get_ui_str(message, max_len=0, min_len=1):
+    error_prompt = f"Input length must be between {min_len} and {max_len} characters"
+    user_text = ""
+
+    if min_len == 0:
+        min_len = 1
+
+    while len(user_text) < min_len:
+        user_text = input(message)
+        if max_len and not len(user_text) in range(min_len, max_len + 1):
+            print(error_prompt)
+            user_text = ""
+
+    return user_text
+
