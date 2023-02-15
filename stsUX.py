@@ -40,13 +40,17 @@ def get_ui_int(message, max_value, min_value=1):
 
 
 def get_ui_yn(message):
+    user_input = {
+        "y": True,
+        "n": False
+    }
     error_prompt = "Choice must be either 'y' or 'n'"
     choice = ""
     while not choice == "y" or not choice == "n":
-        choice = input(message)
+        choice = input(message).lower()
         if not choice == "y" or not choice == "n":
             print(error_prompt)
-    return choice
+    return user_input[choice]
 
 
 def get_ui_str(message, max_len=0, min_len=1):
@@ -64,3 +68,23 @@ def get_ui_str(message, max_len=0, min_len=1):
 
     return user_text
 
+def get_ui_ticket_status():
+    ticket_status = 0
+    statuses = {
+        1: "created", 
+        2: "awaiting response", 
+        3: "in process", 
+        4: "closed"}
+
+    print("Please enter a number to select a ticket status from the following options:\n")
+    
+    for status in statuses:
+        print(f"{status}: {statuses[status].capitalize()}")
+    print()
+
+    while ticket_status < 1 or ticket_status > 5:
+        try:
+            ticket_status = int(input(f"Enter number between 1 - {len(statuses)}: "))
+        except ValueError:
+            print(f"User must enter a number between 1 - {len(statuses)}")
+    return statuses[ticket_status]
