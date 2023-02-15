@@ -31,7 +31,7 @@ database = "sts.db"
 global_ticket_count = 0
 
 
-def create_ticket_2():
+def create_ticket():
     print()
     ticket = stsTicketOps.create_ticket()
     ticket.print_ticket()
@@ -42,7 +42,7 @@ def create_ticket_2():
     global_ticket_count = stsDBOps.count_tickets(database)
 
 
-def update_ticket_2():
+def update_ticket():
     if global_ticket_count == 0:
         print("There are currently no tickets in the database")
     else: 
@@ -65,7 +65,7 @@ def update_ticket_2():
             del ticket
 
 
-def view_ticket_2():
+def view_ticket():
     print()
     if global_ticket_count == 0:
         print("There are currently no tickets in the database")
@@ -82,7 +82,7 @@ def view_ticket_2():
             stsDBOps.find_ticket(database)
 
 
-def delete_ticket_2():
+def delete_ticket():
     print()
     if global_ticket_count == 0:
         print("There are currently no tickets in the database")
@@ -93,10 +93,10 @@ def delete_ticket_2():
 
 
 main_menu_list = [
-    create_ticket_2,
-    update_ticket_2,
-    view_ticket_2,
-    delete_ticket_2
+    create_ticket,
+    update_ticket,
+    view_ticket,
+    delete_ticket
 ]
 
 
