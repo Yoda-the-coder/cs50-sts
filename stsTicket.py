@@ -10,7 +10,12 @@ class Ticket:
         self.id = 0
         self.sev = int(sev)
         self.title = str(title)
-        self.status = str(status)
+        self.statuses = {
+        1: "created", 
+        2: "awaiting response", 
+        3: "in process", 
+        4: "closed"}
+        self.status = self.statuses[1]
         self.info = str(info)
         self.updated_by = str(created_by)
         self.created_by = str(created_by)
