@@ -72,7 +72,6 @@ def get_user():
 def create_ticket():
     sev = int(get_ticket_sev())
     title = get_ticket_title()
-    status = "created"
     info = get_ticket_info()
     created_by = get_user()
     date_created = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
