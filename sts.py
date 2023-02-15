@@ -101,22 +101,31 @@ def delete_ticket():
         global_ticket_count = stsDBOps.count_tickets(database)
 
 
-main_menu_list = [
-    create_ticket,
-    update_ticket,
-    view_ticket,
-    delete_ticket
-]
+main_menu_list = {
+    1: ("Create Ticket", create_ticket),
+    2: ("Update a Ticket", update_ticket),
+    3: ("View Ticket/s", view_ticket),
+    4: ("Delete a Ticket", delete_ticket),
+    5: ("Quit Simple-Ticketing-System", None)
+}
+
+
+def print_menu():
+    # function prints main menu to screen 
+    print("--- Main menu ---\n")
+    for i in range(1, len(main_menu_list) + 1):
+        print(f"{i}: {main_menu_list[i][0]}")
+    print()
 
 
 def main_menu():
     menu_choice = 0
     while not menu_choice == 5:
-        stsUX.print_menu()
+        print_menu()
         menu_choice = stsUX.get_ui_int("Enter your selection (1 - 5): ", 5)
         
         if menu_choice in range(1, 4):
-            main_menu_list[menu_choice - 1]()
+            main_menu_list[menu_choice][1]()
                         
 
 def main():

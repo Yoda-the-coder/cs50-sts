@@ -12,19 +12,6 @@ Simple Ticketing System v{version}
     """)
 
 
-def print_menu():
-    # function prints main menu to screen 
-    print(
-"""Main Menu:
-
-1: Create Ticket
-2: Update a Ticket
-3: View Ticket/s
-4: Delete a Ticket
-5: Quit Simple-Ticket-System
-    """)
-
-
 def get_ui_int(message, max_value, min_value=1):
     error_prompt = f"Choice must be a number between {min_value} - {max_value}"
     choice = 0

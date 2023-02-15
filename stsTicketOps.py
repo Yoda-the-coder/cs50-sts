@@ -67,15 +67,3 @@ def get_user():
         user_name = str(input("Please enter employee ID: ")).lower()
     return user_name
 
-
-# combines necessary functions to obtain user data before creating & returning a ticket object
-def create_ticket():
-    sev = int(get_ticket_sev())
-    title = get_ticket_title()
-    info = get_ticket_info()
-    created_by = get_user()
-    date_created = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-    ticket = stsTicket.Ticket(sev=sev, title=title, status=status, info=info, created_by=created_by, date_created=date_created)
-    return ticket
-
