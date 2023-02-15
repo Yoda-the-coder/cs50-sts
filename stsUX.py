@@ -46,9 +46,11 @@ def get_ui_yn(message):
     }
     error_prompt = "Choice must be either 'y' or 'n'"
     choice = ""
-    while not choice == "y" or not choice == "n":
+    while not choice == "y" and not choice == "n":
         choice = input(message).lower()
-        if not choice == "y" or not choice == "n":
+        print(choice)
+        print(user_input[choice])
+        if not choice == "y" and not choice == "n":
             print(error_prompt)
     return user_input[choice]
 
@@ -63,10 +65,13 @@ def get_ui_str(message, max_len=0, min_len=1):
     while len(user_text) < min_len:
         user_text = input(message)
         if max_len and not len(user_text) in range(min_len, max_len + 1):
-            print(error_prompt)
+            if max_len == min_len:
+                print(f"Input must be {min_len} characters")
+            else:
+                print(error_prompt)
             user_text = ""
-
     return user_text
+
 
 def get_ui_ticket_status():
     ticket_status = 0

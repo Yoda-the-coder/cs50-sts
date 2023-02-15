@@ -5,7 +5,7 @@ import stsTicketOps
 
 
 class Ticket:
-    def __init__(self, sev, title, status, info, created_by, date_created):
+    def __init__(self, sev, title, info, created_by, date_created):
         # constructor
         self.id = 0
         self.sev = int(sev)

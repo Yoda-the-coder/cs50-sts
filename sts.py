@@ -33,7 +33,16 @@ global_ticket_count = 0
 
 def create_ticket():
     print()
-    ticket = stsTicketOps.create_ticket()
+    ticket_sev = stsUX.get_ui_int("Please input ticket severity, 1 (high) - 5 (low): ", 5)
+    ticket_title = stsUX.get_ui_str("Please enter a ticket title (max: 30 chars): ", 30, 5)
+    if stsUX.get_ui_yn("Would you like to add any information to the ticket? (y/n): "):
+        ticket_info = stsUX.get_ui_str()
+    else:
+        ticket_info = "N/A"
+    created_by = stsUX.get_ui_str("Please enter your employee ID (8 characters): ", 8, 8)
+    date_created = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    ticket = Ticket(ticket_sev, ticket_title, ticket_info, created_by, date_created)
+    
     ticket.print_ticket()
     ticket.save_ticket(database, "create")
     print()
