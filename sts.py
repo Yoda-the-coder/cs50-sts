@@ -19,86 +19,92 @@ __author__ = "Ashley Taylor"
 __status__ = "prototype"
 __date__ = "15-02-2008"
 
-import datetime
-import sqlite3
+import sts_ux
+import sts_db_ops
+from sts_ticket import Ticket
 
-import stsUX
-import stsDBOps
-import stsTicketOps
-from stsTicket import Ticket
-
-database = "sts.db"
-global_ticket_count = 0
+DATABASE = "sts.db"
 
 
 def create_ticket():
+    """Function prompts user for necessary info
+    and returns a 'ticket' obj.
+    """
     print()
-    ticket_sev = stsUX.get_ui_int("Please input ticket severity, 1 (high) - 5 (low): ", 5)
-    ticket_title = stsUX.get_ui_str("Please enter a ticket title (max: 30 chars): ", 30, 5)
-    if stsUX.get_ui_yn("Would you like to add any information to the ticket? (y/n): "):
-        ticket_info = stsUX.get_ui_str()
+    ticket_sev = sts_ux.get_ui_int(
+        "Please input ticket severity, 1 (high) - 5 (low): ", 5)
+    ticket_title = sts_ux.get_ui_str(
+        "Please enter a ticket title (max: 30 chars): ", 30, 5)
+    if sts_ux.get_ui_yn("Would you like to add any information to the ticket? (y/n): "):
+        ticket_info = sts_ux.get_ui_str(
+            "Please enter ticket information (max: 100 characters): ", 100)
     else:
         ticket_info = "N/A"
-    created_by = stsUX.get_ui_str("Please enter your employee ID (8 characters): ", 8, 8)
-    date_created = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    ticket = Ticket(ticket_sev, ticket_title, ticket_info, created_by, date_created)
-    
+    username = sts_ux.get_ui_str(
+        "Please enter your employee ID (8 characters): ", 8, 8)
+    # date_created = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    ticket = Ticket(ticket_sev, ticket_title, ticket_info, username)
+
     ticket.print_ticket()
-    ticket.save_ticket(database, "create")
+    # TO DO - Move func to db ops module and add date/time
+    ticket.save_ticket(DATABASE, "create")
     print()
     del ticket
-    global global_ticket_count
-    global_ticket_count = stsDBOps.count_tickets(database)
 
 
 def update_ticket():
-    if global_ticket_count == 0:
+    """Function updates a ticket currently in the db"""
+    ticket_count = sts_db_ops.count_tickets(DATABASE)
+    if ticket_count == 0:
         print("There are currently no tickets in the database")
-    else: 
-        ticket_info = stsDBOps.find_ticket(database)
+    else:
+        username = sts_ux.get_ui_str(
+        "Please enter your employee ID (8 characters): ", 8, 8)
+        ticket_info = sts_db_ops.find_ticket(DATABASE)
         while ticket_info:
-            ticket = Ticket(ticket_info[1], ticket_info[2], ticket_info[3], ticket_info[4], ticket_info[6], ticket_info[8])
-            ticket.id = ticket_info[0]
+            # ************* TO DO ****************
+            ticket = Ticket(ticket_info[1], ticket_info[2], ticket_info[4], username)
+            ticket.i_d = ticket_info[0]
             update_complete = False
             while not update_complete:
                 ticket.update_ticket()
                 ticket.print_ticket()
                 choice = ""
-                while not choice.lower() == "y" and not choice.lower() == "n":
-                    choice = input("Would you like to update any more fields on the ticket? (y/n): ").lower()
-                if choice == "n":                    
+                while choice.lower() != "y" and choice.lower() != "n":
+                    choice = input(
+                        "Would you like to update any more fields on the ticket? (y/n): ").lower()
+                if choice == "n":
                     update_complete = True
                     print()
-                    ticket.save_ticket(database, "update")
+                    ticket.save_ticket(DATABASE, "update")
             ticket_info = False
             del ticket
 
 
 def view_ticket():
+    """Function prompts user and either displays all tickets or a selected ticket"""
     print()
-    if global_ticket_count == 0:
+    ticket_count = sts_db_ops.count_tickets(DATABASE)
+    if ticket_count == 0:
         print("There are currently no tickets in the database")
-    else: 
-        choice = ""
-        while not choice.lower() == "y" and not choice.lower() == "n":
-            choice = input("Would you like to view all tickets? (y/n): ").lower()
-            print()
-
-        if choice == "y":    
-            if not stsDBOps.view_all_tickets(database):
-                print("No tickets found")
+    else:
+        choice = sts_ux.get_ui_yn(
+            "Would you like to view all tickets? (y/n): ")
+        if choice == "y":
+            sts_db_ops.view_all_tickets(DATABASE)
         else:
-            stsDBOps.find_ticket(database)
+            sts_db_ops.find_ticket(DATABASE)
 
 
 def delete_ticket():
+    """Function checks for tickets then calls the delete_ticket function from sts_db_ops module"""
     print()
-    if global_ticket_count == 0:
+    ticket_count = sts_db_ops.count_tickets(DATABASE)
+    if ticket_count == 0:
         print("There are currently no tickets in the database")
-    else: 
-        stsDBOps.delete_ticket(database)
+    else:
+        sts_db_ops.delete_ticket(DATABASE)
         print()
-        global_ticket_count = stsDBOps.count_tickets(database)
 
 
 main_menu_list = {
@@ -111,7 +117,7 @@ main_menu_list = {
 
 
 def print_menu():
-    # function prints main menu to screen 
+    """function prints main menu to screen"""
     print("--- Main menu ---\n")
     for i in range(1, len(main_menu_list) + 1):
         print(f"{i}: {main_menu_list[i][0]}")
@@ -119,25 +125,29 @@ def print_menu():
 
 
 def main_menu():
+    """Function dynamically prints the menu options,
+    gets UI and launches relevant function. If user
+    inputs '5', program will quit.
+    """
     menu_choice = 0
-    while not menu_choice == 5:
+    while menu_choice != 5:
         print_menu()
-        menu_choice = stsUX.get_ui_int("Enter your selection (1 - 5): ", 5)
-        
+        menu_choice = sts_ux.get_ui_int("Enter your selection (1 - 5): ", 5)
+
         if menu_choice in range(1, 4):
             main_menu_list[menu_choice][1]()
-                        
+
 
 def main():
+    """Main sts function that is first run, looks after startup, main menu and quitting"""
     # displays sts logo, name and version
-    stsUX.print_logo(__version__)
+    sts_ux.print_logo(__version__)
 
     # initialise db connection, confirm successful connection test
-    stsDBOps.db_init(database)
+    sts_db_ops.db_init(DATABASE)
 
     # shows user number of tickets in the database
-    global global_ticket_count
-    global_ticket_count = stsDBOps.count_tickets(database)
+    sts_db_ops.count_tickets(DATABASE)
 
     # main menu
     print()
@@ -145,10 +155,10 @@ def main():
 
     # quit STS
     print("\n - Thank you for using - ")
-    stsUX.print_logo(__version__)
+    sts_ux.print_logo(__version__)
 
     return 0
-    
+
 
 if __name__ == "__main__":
     main()
