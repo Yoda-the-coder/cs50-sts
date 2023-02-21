@@ -1,2 +1,4 @@
+.history
 env
 __pycache__
+sts_database.db
