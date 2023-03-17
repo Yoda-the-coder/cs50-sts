@@ -1,4 +1,7 @@
-.history
-env
 __pycache__
+.history
+.vscode
+env
+logs
 sts_database.db
+test_sts_database.db
