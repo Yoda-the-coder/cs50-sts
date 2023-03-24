@@ -1,6 +1,7 @@
 """Module defines 'Ticket' class to be used by STS"""
 
 import logging
+from sts_logging import log_function
 
 logger = logging.getLogger(__name__)
 
@@ -8,6 +9,7 @@ logger = logging.getLogger(__name__)
 class Ticket:
     """Creates a 'ticket' object, populating all relevant data fields."""
 
+    @log_function
     def __init__(self, severity, title, info, username):
         # constructor
         self.i_d = 0
@@ -36,6 +38,7 @@ class Ticket:
         ---- End of Ticket ----\n"""
         return print_format
 
+    @log_function
     def print_ticket(self):
         """Method to print the ticket."""
         logger.info("Ticket object printed to screen")

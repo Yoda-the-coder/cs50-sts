@@ -22,15 +22,17 @@ __date__ = "15-02-2008"
 import sys
 import logging
 from datetime import datetime
-import sts_ux
+import sts_user_inputs
 import sts_db_ops
 from sts_ticket import Ticket
+from sts_logging import log_function
+
 
 DATABASE_INFO = {"db_name": "./database/test_sts_database.db", "table_name": "tickets"}
 
 # inits log file and logging settings
 logging.basicConfig(
-    format="%(asctime)s %(levelname)s :: %(name)s :: %(funcName)s :: %(message)s",
+    format="%(asctime)s %(levelname)s :: %(name)s :: %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
     filename=f'./logs/{datetime.now().strftime("%Y-%m-%d %H:%M")}_sts_log.log',
     filemode="w",
@@ -41,21 +43,24 @@ logger = logging.getLogger(__name__)
 
 
 # CREATE
+@log_function
 def create_ticket(username):
     """Function prompts user for necessary info
     and returns a 'ticket' obj.
     """
 
-    ticket_sev = sts_ux.get_ui_int(
+    ticket_sev = sts_user_inputs.get_ui_int(
         "Please input ticket severity, 1 (high) - 5 (low): ", 5
     )
 
-    ticket_title = sts_ux.get_ui_str(
+    ticket_title = sts_user_inputs.get_ui_str(
         "Please enter a ticket title (max: 30 chars): ", 30, 5
     )
 
-    if sts_ux.get_ui_yn("Would you like to add any information to the ticket? (y/N): "):
-        ticket_info = sts_ux.get_ui_str(
+    if sts_user_inputs.get_ui_yn(
+        "Would you like to add any information to the ticket? (y/N): "
+    ):
+        ticket_info = sts_user_inputs.get_ui_str(
             "Please enter ticket information (max: 100 characters): ", 100
         )
     else:
@@ -67,8 +72,8 @@ def create_ticket(username):
 
     ticket.print_ticket()
 
-    if not sts_ux.get_ui_yn("Would you like to save the ticket? (y/N): "):
-        if sts_ux.get_ui_yn(
+    if not sts_user_inputs.get_ui_yn("Would you like to save the ticket? (y/N): "):
+        if sts_user_inputs.get_ui_yn(
             "Are you sure you would like to delete the ticket? (y/N): "
         ):
             logger.warning("ticket not saved to db")
@@ -80,6 +85,7 @@ def create_ticket(username):
 
 
 # READ
+@log_function
 def view_tickets(username):
     """Function dynamically prints the view menu options,
     gets UI and launches relevant view function.
@@ -93,6 +99,7 @@ def view_tickets(username):
 
 
 # UPDATE
+@log_function
 def update_ticket(username):
     """Function finds and updates a ticket in the db"""
 
@@ -121,7 +128,7 @@ def update_ticket(username):
     # Updates ticket object
     while True:
         print_update_menu()
-        menu_choice = sts_ux.get_ui_int(
+        menu_choice = sts_user_inputs.get_ui_int(
             f"Enter your selection (1 - {len(update_ticket_list)}): ",
             len(update_ticket_list),
         )
@@ -132,13 +139,15 @@ def update_ticket(username):
 
         ticket = update_ticket_list[menu_choice][1](ticket)
 
-        if not sts_ux.get_ui_yn("Would you like to update any more fields? (y/N): "):
+        if not sts_user_inputs.get_ui_yn(
+            "Would you like to update any more fields? (y/N): "
+        ):
             ticket.print_ticket()
             break
 
     # user confirms save changes, if no - process quit
-    if not sts_ux.get_ui_yn("Would you like to save updates? (y/n): "):
-        if sts_ux.get_ui_yn("Are you sure? All updates will be lost! (y/n): "):
+    if not sts_user_inputs.get_ui_yn("Would you like to save updates? (y/n): "):
+        if sts_user_inputs.get_ui_yn("Are you sure? All updates will be lost! (y/n): "):
             logger.warning("user cancelled update - ticket not saved to db")
             del ticket
             return False
@@ -149,6 +158,7 @@ def update_ticket(username):
 
 
 # DELETE
+@log_function
 def delete_ticket(username):
     """Function checks for tickets then calls the delete_ticket function from sts_db_ops module"""
 
@@ -164,8 +174,10 @@ def delete_ticket(username):
 
     # Queries user before attempting to delete ticket from db
     try:
-        if ticket and sts_ux.get_ui_yn("Would you like to delete the ticket? (y/N): "):
-            if sts_ux.get_ui_yn(
+        if ticket and sts_user_inputs.get_ui_yn(
+            "Would you like to delete the ticket? (y/N): "
+        ):
+            if sts_user_inputs.get_ui_yn(
                 "Are you sure? The ticket will be lost forever! (y/N): "
             ):
                 sts_db_ops.delete_ticket_by_id(DATABASE_INFO, ticket[0][0])
@@ -181,11 +193,12 @@ def delete_ticket(username):
         return False
 
 
+@log_function
 def find_ticket_id(username):
     """Function to assist user find ticket id"""
 
     while True:
-        if sts_ux.get_ui_yn("Do you know the ticket ID? (y/N): "):
+        if sts_user_inputs.get_ui_yn("Do you know the ticket ID? (y/N): "):
             break
 
         if not view_tickets_menu(username):
@@ -194,28 +207,31 @@ def find_ticket_id(username):
     return True
 
 
+@log_function
 def update_severity(ticket):
     """Function updates the severity of a ticket and returns updated ticket object"""
 
-    ticket.sev = sts_ux.get_ui_int(
+    ticket.sev = sts_user_inputs.get_ui_int(
         "Please input ticket severity, 1 (high) - 5 (low): ", 5
     )
     return ticket
 
 
+@log_function
 def update_title(ticket):
     """Function updates the title of a ticket and returns updated ticket object"""
 
-    ticket.title = sts_ux.get_ui_str("Please enter the updated title: ", 30)
+    ticket.title = sts_user_inputs.get_ui_str("Please enter the updated title: ", 30)
     return ticket
 
 
+@log_function
 def update_status(ticket):
     """Function updates the status of a ticket and returns updated ticket object"""
 
     print_ticket_statuses()
 
-    status_index = sts_ux.get_ui_int(
+    status_index = sts_user_inputs.get_ui_int(
         f"Select a status from the above options (1 - {len(ticket_statuses_list)}): ",
         len(ticket_statuses_list),
     )
@@ -224,19 +240,21 @@ def update_status(ticket):
     return ticket
 
 
+@log_function
 def update_info(ticket):
     """Function updates the info of a ticket and returns updated ticket object"""
 
-    ticket.info = sts_ux.get_ui_str(
+    ticket.info = sts_user_inputs.get_ui_str(
         "Please enter updated ticket information (max: 100 characters): ", 100
     )
     return ticket
 
 
+@log_function
 def search_db_by_id():
     """Prompts user for ID, prints ticket to screen or notifies user ticket doesn't exist"""
     min_max_ids = sts_db_ops.find_id_range(DATABASE_INFO)
-    ticket_id = sts_ux.get_ui_int(
+    ticket_id = sts_user_inputs.get_ui_int(
         "Please enter the ticket ID: ", int(min_max_ids[0][1]), int(min_max_ids[0][0])
     )
 
@@ -247,28 +265,33 @@ def search_db_by_id():
     return ticket
 
 
+@log_function
 def search_db_by_title():
     """Prompts user for title, prints ticket to screen or notifies user ticket doesn't exist"""
-    ticket_title = sts_ux.get_ui_str("Please enter the title to search: ", 30)
+    ticket_title = sts_user_inputs.get_ui_str("Please enter the title to search: ", 30)
     search = f"%{ticket_title}%"
 
     if not sts_db_ops.search_database(DATABASE_INFO, "title", search, "title"):
         print("No match found in the database\n")
 
 
+@log_function
 def search_db_by_sev():
     """Prompts user for info, prints ticket to screen or notifies user if ticket doesn't exist"""
-    search = sts_ux.get_ui_int("Please input ticket severity, 1 (high) - 5 (low): ", 5)
+    search = sts_user_inputs.get_ui_int(
+        "Please input ticket severity, 1 (high) - 5 (low): ", 5
+    )
 
     if not sts_db_ops.search_database(DATABASE_INFO, "severity", search, "severity"):
         print("No match found in the database\n")
 
 
+@log_function
 def search_db_by_status():
     """prompts user for ticket status, queries db and prints results to screen"""
     print_ticket_statuses()
 
-    search = sts_ux.get_ui_int(
+    search = sts_user_inputs.get_ui_int(
         f"Select a status from the above options (1 - {len(ticket_statuses_list)}): ",
         len(ticket_statuses_list),
     )
@@ -279,11 +302,12 @@ def search_db_by_status():
         print("No match found in the database\n")
 
 
+@log_function
 def search_db_by_username():
     """Prompts user for a username, queries db and prints results to screen"""
     username = "0"
     while not username.isalpha():
-        username = sts_ux.get_ui_str(
+        username = sts_user_inputs.get_ui_str(
             "Please enter employee ID to search (8 characters): ", 8, 8
         )
         if not username.isalpha():
@@ -293,39 +317,7 @@ def search_db_by_username():
         print("No match found in the database\n")
 
 
-def print_update_menu():
-    """function prints update ticket options to screen"""
-    print("--- Update Ticket ---\n")
-    for i in range(1, len(update_ticket_list) + 1):
-        print(f"{i}: {update_ticket_list[i][0]}")
-    print()
-
-
-def print_view_menu(menu_length):
-    """Function prints view menu list to screen"""
-    print("--- View Menu ---\n")
-    for i in range(1, menu_length + 1):
-        print(f"{i}: {view_ticket_list[i][0]}")
-    print()
-
-
-def print_ticket_statuses():
-    """function prints ticket status options to screen"""
-    print("--- Ticket Statuses ---\n")
-    for count, value in enumerate(ticket_statuses_list):
-        print(f"{count + 1}: {value.capitalize()}")
-    print()
-
-
-def print_main_menu():
-    """function prints main menu to screen"""
-
-    print("--- Main menu ---\n")
-    for i in range(1, len(main_menu_list) + 1):
-        print(f"{i}: {main_menu_list[i][0]}")
-    print()
-
-
+@log_function
 def get_username():
     """function queries user, validates and returns username"""
 
@@ -333,11 +325,13 @@ def get_username():
     username_2 = "1"
     while True:
         try:
-            username = sts_ux.get_ui_str(
-                "Please enter employee ID (8 characters): ", 8, 8, True
+            username = sts_user_inputs.get_ui_str(
+                "Please enter employee ID (8 characters): ", 8, 8, True, False
             )
 
-            username_2 = sts_ux.get_ui_str("Please re-enter employee ID: ", 8, 8, True)
+            username_2 = sts_user_inputs.get_ui_str(
+                "Please re-enter employee ID: ", 8, 8, True, False
+            )
 
             if username != username_2:
                 raise ValueError("Usernames do not match, please retry")
@@ -351,6 +345,7 @@ def get_username():
     return username
 
 
+@log_function
 def view_tickets_menu(username):
     """prints view menu and calls appropriate function to view by user selection"""
 
@@ -358,7 +353,7 @@ def view_tickets_menu(username):
     menu_choice = 0
 
     print_view_menu(menu_size)
-    menu_choice = sts_ux.get_ui_int(
+    menu_choice = sts_user_inputs.get_ui_int(
         f"Enter your selection (1 - {menu_size}): ", menu_size
     )
     logger.info("%s - '%s'", view_ticket_list[menu_choice][0], username)
@@ -367,13 +362,58 @@ def view_tickets_menu(username):
         view_ticket_list[menu_choice][1](DATABASE_INFO)
         return True
 
-    if menu_choice in range(2, menu_size - 1):
+    if menu_choice in range(2, menu_size):
         view_ticket_list[menu_choice][1]()
         return True
 
     return False
 
 
+@log_function
+def print_update_menu():
+    """function prints update ticket options to screen"""
+
+    logger.info("update ticket menu displayed")
+    print("--- Update Ticket ---\n")
+    for i in range(1, len(update_ticket_list) + 1):
+        print(f"{i}: {update_ticket_list[i][0]}")
+    print()
+
+
+@log_function
+def print_view_menu(menu_length):
+    """Function prints view menu list to screen"""
+
+    logger.info("view ticket/s menu displayed")
+    print("--- View Menu ---\n")
+    for i in range(1, menu_length + 1):
+        print(f"{i}: {view_ticket_list[i][0]}")
+    print()
+
+
+@log_function
+def print_ticket_statuses():
+    """function prints ticket status options to screen"""
+
+    logger.info("ticket status options displayed")
+    print("--- Ticket Statuses ---\n")
+    for count, value in enumerate(ticket_statuses_list):
+        print(f"{count + 1}: {value.capitalize()}")
+    print()
+
+
+@log_function
+def print_main_menu():
+    """function prints main menu to screen"""
+
+    logger.info("main menu displayed")
+    print("--- Main menu ---\n")
+    for i in range(1, len(main_menu_list) + 1):
+        print(f"{i}: {main_menu_list[i][0]}")
+    print()
+
+
+@log_function
 def print_logo(version):
     """function prints STS logo and version to screen"""
 
@@ -391,6 +431,7 @@ Simple Ticketing System v{version}
     )
 
 
+@log_function
 def main_menu():
     """Function dynamically prints the menu options,
     gets UI and launches relevant function. If user
@@ -409,7 +450,7 @@ def main_menu():
         print_main_menu()
 
         # prompts user for menu choice
-        menu_choice = sts_ux.get_ui_int("Enter your selection (1 - 6): ", 6)
+        menu_choice = sts_user_inputs.get_ui_int("Enter your selection (1 - 6): ", 6)
 
         # calls appropriate func dependent on user input
         if menu_choice in range(1, len(main_menu_list) - 1):
@@ -417,6 +458,7 @@ def main_menu():
             main_menu_list[menu_choice][1](username)
 
 
+@log_function
 def main():
     """Main sts function that is first run, looks after startup, main menu and quitting"""
 

@@ -4,12 +4,14 @@ import sqlite3
 import datetime
 import logging
 from tabulate import tabulate
+from sts_logging import log_function
 
 
 logger = logging.getLogger(__name__)
 
 
 # TEST DB
+@log_function
 def db_test(database):
     """Inits db, logs connection and sqlite3 version. If table doesn't exist, new one is created.
     Returns True if no errors, otherwise returns False and logs errors"""
@@ -65,6 +67,7 @@ System is ready to use.
 
 
 # TEST TABLE
+@log_function
 def db_table_test(database, cursor):
     """Tests the db file to assert whether a table exists, if not a new table is created"""
 
@@ -92,6 +95,7 @@ def db_table_test(database, cursor):
 
 
 # COUNT
+@log_function
 def count_tickets(database):
     """Function counts tickets in db and returns an int"""
     try:
@@ -120,6 +124,7 @@ def count_tickets(database):
 
 
 # CREATE
+@log_function
 def insert_ticket_to_db(database, ticket):
     """Function inserts a new ticket into the database"""
 
@@ -162,6 +167,7 @@ def insert_ticket_to_db(database, ticket):
 
 
 # READ
+@log_function
 def search_database(database, category, search, order="id"):
     """Function dynamically searches database based on user input,
     prints to screen and returns result"""
@@ -215,6 +221,7 @@ def search_database(database, category, search, order="id"):
 
 
 # UPDATE
+@log_function
 def update_ticket_to_db(database, ticket):
     """Updates a ticket in the database"""
 
@@ -264,6 +271,7 @@ def update_ticket_to_db(database, ticket):
 
 
 # DELETE
+@log_function
 def delete_ticket_by_id(database, ticket_id):
     """deletes a ticket from the database, by id"""
 
@@ -289,6 +297,7 @@ def delete_ticket_by_id(database, ticket_id):
             db_connection.close()
 
 
+@log_function
 def find_id_range(database):
     """Queries database for min and max ids, returns a list of two ints"""
 
@@ -314,6 +323,7 @@ def find_id_range(database):
             logger.info("db connection closed")
 
 
+@log_function
 def view_all_tickets(database):
     """Function displays all tickets in database"""
 
