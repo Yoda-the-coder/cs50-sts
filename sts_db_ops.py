@@ -1,4 +1,9 @@
-"""Module defines STS functions that interface with the sqlite3 database"""
+"""Module defines STS functions that interface with the sqlite3 database
+
+File: sts_db_ops.py
+Disclaimer: The following source code is the sole work of the author unless otherwise stated. 
+Copyright (C) Ashley Taylor. All Rights Reserved.
+"""
 
 import sqlite3
 import datetime

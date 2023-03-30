@@ -1,5 +1,9 @@
 """
 Logging module defines 'log_function' decorator
+
+File: sts_logging.py
+Disclaimer: The following source code is the sole work of the author unless otherwise stated. 
+Copyright (C) Ashley Taylor. All Rights Reserved.
 """
 
 import logging

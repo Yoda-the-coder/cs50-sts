@@ -1,13 +1,17 @@
 """STS - Simple-Ticketing-System.
 
-Usage: main.py
-Firstly the DATABASE_INFO is checked before the main menu is displayed, offering
-capabilities to create, read, update, delete and store departmental
-IT tickets.
+Program: STS - Simple Ticketing System
+Filename: main.py
+Course: BSc Digital and Technology Solutions
+Module: Software Engineering Fundamentals
+Tutor: Cain Evans
 Data: SQLite3 database with a 'tickets' table './database/sts_database.db'.
 Target users: Departmental engineers and managers.
 Interface: Command-line
 Testing methods: Automated Unit Testing and Manual Testing with a 'test database'.
+File: main.py
+Disclaimer: The following source code is the sole work of the author unless otherwise stated. 
+Copyright (C) Ashley Taylor. All Rights Reserved.
 """
 
 __version__ = 2.0

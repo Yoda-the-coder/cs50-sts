@@ -1,4 +1,9 @@
-"""Module defines 'Ticket' class to be used by STS"""
+"""Module defines 'Ticket' class to be used by STS
+
+File: sts_ticket.py
+Disclaimer: The following source code is the sole work of the author unless otherwise stated. 
+Copyright (C) Ashley Taylor. All Rights Reserved.
+"""
 
 import logging
 from sts_logging import log_function

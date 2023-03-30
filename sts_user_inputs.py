@@ -1,4 +1,9 @@
-"""Module provides user input validation methods"""
+"""Module provides user input validation methods
+
+File: sts_user_inputs.py
+Disclaimer: The following source code is the sole work of the author unless otherwise stated. 
+Copyright (C) Ashley Taylor. All Rights Reserved.
+"""
 
 import logging
 from sts_logging import log_function
