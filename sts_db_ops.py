@@ -1,4 +1,4 @@
-"""Module defines functions that interface the sqlite3 database"""
+"""Module defines STS functions that interface with the sqlite3 database"""
 
 import sqlite3
 import datetime
