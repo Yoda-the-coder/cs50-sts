@@ -1,23 +1,20 @@
 """STS - Simple-Ticketing-System.
 
-Usage: sts.py
-Firstly the DATABASE_INFO is checked and a main menu is displayed, offering
+Usage: main.py
+Firstly the DATABASE_INFO is checked before the main menu is displayed, offering
 capabilities to create, read, update, delete and store departmental
 IT tickets.
-Target users: Department engineers and managers.
-Target system: OSX
+Data: SQLite3 database with a 'tickets' table './database/sts_database.db'.
+Target users: Departmental engineers and managers.
 Interface: Command-line
-Functional requirements:
-Testing methods:
-Expected results:
-Limitations: 
+Testing methods: Automated Unit Testing and Manual Testing with a 'test database'.
 """
 
 __version__ = 2.0
 __maintainer__ = "ashtaylor2010@gmail.com"
 __author__ = "Ashley Taylor"
 __status__ = "prototype"
-__date__ = "15-02-2008"
+__date__ = "30-03-2023"
 
 import sys
 import logging
@@ -28,7 +25,7 @@ from sts_ticket import Ticket
 from sts_logging import log_function
 
 
-DATABASE_INFO = {"db_name": "./database/test_sts_database.db", "table_name": "tickets"}
+DATABASE_INFO = {"db_name": "./database/sts_database.db", "table_name": "tickets"}
 
 # inits log file and logging settings
 logging.basicConfig(
@@ -45,9 +42,7 @@ logger = logging.getLogger(__name__)
 # CREATE
 @log_function
 def create_ticket(username):
-    """Function prompts user for necessary info
-    and returns a 'ticket' obj.
-    """
+    """Prompts user and creates a ticket."""
 
     ticket_sev = sts_user_inputs.get_ui_int(
         "Please input ticket severity, 1 (high) - 5 (low): ", 5
@@ -66,21 +61,22 @@ def create_ticket(username):
     else:
         ticket_info = "N/A"
 
-    # date_created = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    # Creates a ticket object and prints it to the console
     ticket = Ticket(ticket_sev, ticket_title, ticket_info, username)
     logger.info("new ticket created by '%s'", username)
-
     ticket.print_ticket()
 
+    # Asks user if they would like to save the ticket to the database
     if not sts_user_inputs.get_ui_yn("Would you like to save the ticket? (y/N): "):
         if sts_user_inputs.get_ui_yn(
             "Are you sure you would like to delete the ticket? (y/N): "
         ):
             logger.warning("ticket not saved to db")
+            print("Ticket not saved to database\n")
             return
 
+    # Saves ticket to database, then deletes the ticket object
     sts_db_ops.insert_ticket_to_db(DATABASE_INFO, ticket)
-
     del ticket
 
 
@@ -88,12 +84,14 @@ def create_ticket(username):
 @log_function
 def view_tickets(username):
     """Function dynamically prints the view menu options,
-    gets UI and launches relevant view function.
+    gets UI and calls relevant view function.
     """
 
+    # Checks whether db contains any tickets, returns to main menu if False
     if not sts_db_ops.count_tickets(DATABASE_INFO):
         return False
 
+    # Prints view menu options
     while True:
         return view_tickets_menu(username)
 
@@ -101,13 +99,13 @@ def view_tickets(username):
 # UPDATE
 @log_function
 def update_ticket(username):
-    """Function finds and updates a ticket in the db"""
+    """Prompts user, then retrieves ticket from database, to then be updated and saved"""
 
     # Checks whether db contains any tickets, returns to main menu if False
     if not sts_db_ops.count_tickets(DATABASE_INFO):
         return False
 
-    # Find ticket ID
+    # Calls function to find id of ticket
     if not find_ticket_id(username):
         return False
 
@@ -145,31 +143,34 @@ def update_ticket(username):
             ticket.print_ticket()
             break
 
-    # user confirms save changes, if no - process quit
+    # Asks user if they would like to save the ticket to the database
     if not sts_user_inputs.get_ui_yn("Would you like to save updates? (y/n): "):
         if sts_user_inputs.get_ui_yn("Are you sure? All updates will be lost! (y/n): "):
             logger.warning("user cancelled update - ticket not saved to db")
+            print("Updates not saved to database\n")
             del ticket
             return False
 
-    # Updates ticket in DATABASE_INFO, prints confirmation message if successful
+    # Saves ticket to database, then deletes the ticket object
     sts_db_ops.update_ticket_to_db(DATABASE_INFO, ticket)
+    del ticket
     return True
 
 
 # DELETE
 @log_function
 def delete_ticket(username):
-    """Function checks for tickets then calls the delete_ticket function from sts_db_ops module"""
+    """Prompts user for ticket, retrieves ticket and deletes from database"""
 
+    # Checks whether db contains any tickets, returns to main menu if False
     if not sts_db_ops.count_tickets(DATABASE_INFO):
         return False
 
-    # Find ticket ID
+    # Finds ticket ID
     if not find_ticket_id(username):
         return False
 
-    # Gets ticket by ID
+    # Returns the ticket by ID
     ticket = search_db_by_id()
 
     # Queries user before attempting to delete ticket from db
@@ -195,7 +196,7 @@ def delete_ticket(username):
 
 @log_function
 def find_ticket_id(username):
-    """Function to assist user find ticket id"""
+    """Prompts user then displays view ticket options"""
 
     while True:
         if sts_user_inputs.get_ui_yn("Do you know the ticket ID? (y/N): "):
@@ -209,7 +210,7 @@ def find_ticket_id(username):
 
 @log_function
 def update_severity(ticket):
-    """Function updates the severity of a ticket and returns updated ticket object"""
+    """Updates the ticket severity, returning updated ticket object"""
 
     ticket.sev = sts_user_inputs.get_ui_int(
         "Please input ticket severity, 1 (high) - 5 (low): ", 5
@@ -219,7 +220,7 @@ def update_severity(ticket):
 
 @log_function
 def update_title(ticket):
-    """Function updates the title of a ticket and returns updated ticket object"""
+    """Updates the ticket title, returning updated ticket object"""
 
     ticket.title = sts_user_inputs.get_ui_str("Please enter the updated title: ", 30)
     return ticket
@@ -227,7 +228,7 @@ def update_title(ticket):
 
 @log_function
 def update_status(ticket):
-    """Function updates the status of a ticket and returns updated ticket object"""
+    """Updates the ticket status, returning updated ticket object"""
 
     print_ticket_statuses()
 
@@ -242,7 +243,7 @@ def update_status(ticket):
 
 @log_function
 def update_info(ticket):
-    """Function updates the info of a ticket and returns updated ticket object"""
+    """Updates the ticket info, returning updated ticket object"""
 
     ticket.info = sts_user_inputs.get_ui_str(
         "Please enter updated ticket information (max: 100 characters): ", 100
@@ -252,12 +253,15 @@ def update_info(ticket):
 
 @log_function
 def search_db_by_id():
-    """Prompts user for ID, prints ticket to screen or notifies user ticket doesn't exist"""
+    """Prompts user for ID, prints ticket to screen or notifies user if ticket doesn't exist"""
+
+    # Finds id range in database for validation, returns False if no tickets in database
     min_max_ids = sts_db_ops.find_id_range(DATABASE_INFO)
     ticket_id = sts_user_inputs.get_ui_int(
         "Please enter the ticket ID: ", int(min_max_ids[0][1]), int(min_max_ids[0][0])
     )
 
+    # Queries database for ticket, returns ticket or False if not found
     ticket = sts_db_ops.search_database(DATABASE_INFO, "id", ticket_id)
     if not ticket:
         print("Ticket ID not found in Database\n")
@@ -267,7 +271,8 @@ def search_db_by_id():
 
 @log_function
 def search_db_by_title():
-    """Prompts user for title, prints ticket to screen or notifies user ticket doesn't exist"""
+    """Prompts user for title, prints results to screen or notifies user if ticket doesn't exist"""
+
     ticket_title = sts_user_inputs.get_ui_str("Please enter the title to search: ", 30)
     search = f"%{ticket_title}%"
 
@@ -277,7 +282,8 @@ def search_db_by_title():
 
 @log_function
 def search_db_by_sev():
-    """Prompts user for info, prints ticket to screen or notifies user if ticket doesn't exist"""
+    """Prompts user for sev, prints results to screen or notifies user if ticket doesn't exist"""
+
     search = sts_user_inputs.get_ui_int(
         "Please input ticket severity, 1 (high) - 5 (low): ", 5
     )
@@ -288,7 +294,8 @@ def search_db_by_sev():
 
 @log_function
 def search_db_by_status():
-    """prompts user for ticket status, queries db and prints results to screen"""
+    """Prompts user for status, prints results to screen or notifies user if ticket doesn't exist"""
+
     print_ticket_statuses()
 
     search = sts_user_inputs.get_ui_int(
@@ -305,6 +312,7 @@ def search_db_by_status():
 @log_function
 def search_db_by_username():
     """Prompts user for a username, queries db and prints results to screen"""
+
     username = "0"
     while not username.isalpha():
         username = sts_user_inputs.get_ui_str(
@@ -319,7 +327,7 @@ def search_db_by_username():
 
 @log_function
 def get_username():
-    """function queries user, validates and returns username"""
+    """Prompts user, validates and returns username"""
 
     username = "0"
     username_2 = "1"
@@ -347,7 +355,7 @@ def get_username():
 
 @log_function
 def view_tickets_menu(username):
-    """prints view menu and calls appropriate function to view by user selection"""
+    """Prints view menu and calls appropriate function to view by user selection"""
 
     menu_size = len(view_ticket_list)
     menu_choice = 0
@@ -371,7 +379,7 @@ def view_tickets_menu(username):
 
 @log_function
 def print_update_menu():
-    """function prints update ticket options to screen"""
+    """Prints update ticket options to screen"""
 
     logger.info("update ticket menu displayed")
     print("--- Update Ticket ---\n")
@@ -382,7 +390,7 @@ def print_update_menu():
 
 @log_function
 def print_view_menu(menu_length):
-    """Function prints view menu list to screen"""
+    """Prints view menu list to screen"""
 
     logger.info("view ticket/s menu displayed")
     print("--- View Menu ---\n")
@@ -393,7 +401,7 @@ def print_view_menu(menu_length):
 
 @log_function
 def print_ticket_statuses():
-    """function prints ticket status options to screen"""
+    """Prints ticket status options to screen"""
 
     logger.info("ticket status options displayed")
     print("--- Ticket Statuses ---\n")
@@ -404,7 +412,7 @@ def print_ticket_statuses():
 
 @log_function
 def print_main_menu():
-    """function prints main menu to screen"""
+    """Prints main menu to screen"""
 
     logger.info("main menu displayed")
     print("--- Main menu ---\n")
@@ -415,7 +423,7 @@ def print_main_menu():
 
 @log_function
 def print_logo(version):
-    """function prints STS logo and version to screen"""
+    """Prints STS logo and version to screen"""
 
     print(
         f"""
@@ -433,7 +441,7 @@ Simple Ticketing System v{version}
 
 @log_function
 def main_menu():
-    """Function dynamically prints the menu options,
+    """Dynamically prints the menu options,
     gets UI and launches relevant function. If user
     inputs '6', program will quit.
     """
