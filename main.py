@@ -2,9 +2,8 @@
 
 Program: STS - Simple Ticketing System
 Filename: main.py
-Course: BSc Digital and Technology Solutions
-Module: Software Engineering Fundamentals
-Tutor: Cain Evans
+Course: CS50
+Module: Final Project
 Data: SQLite3 database with a 'tickets' table './database/sts_database.db'.
 Target users: Departmental engineers and managers.
 Interface: Command-line
